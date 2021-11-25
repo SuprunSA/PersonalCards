@@ -34,38 +34,26 @@ namespace PersonalCards
                 try
                 {
                     var random = new Random(seed);
-                    var cardIds = new List<int>();
 
                     for (int i = 0; i < 3; i++)
                     {
-                        context.PersonalCards.Add(new PersonalCard()
-                        {
-                            Id = random.Next()
-                        });
+                        context.PersonalCards.Add(GetPersonalCard(random.Next()));
                     }
 
                     context.SaveChanges();
 
                     foreach (var card in context.PersonalCards)
                     {
-                        context.UserProfiles.Add(new UserProfile()
-                        {
-                            UserId = card.Id,
-                            Email = "sth@gmail.ru"
-                        });
-                        cardIds.Add(card.Id);
+                        context.UserProfiles.Add(GetUserProfile(card.Id));
                     }
 
-                    foreach (var cardId in cardIds)
+                    context.SaveChanges();
+
+                    foreach (var card in context.PersonalCards)
                     {
                         for (int i = 0; i < 3; i++)
                         {
-                            context.Purchases.Add(new Purchase()
-                            {
-                                Id = random.Next(),
-                                CardId = cardId,
-                                PurchaseSum = (uint)random.Next(1000)
-                            });
+                            context.Purchases.Add(GetPurchase(random.Next(), card.Id, random.Next(1000)));
                         }
                     }
 
@@ -94,6 +82,30 @@ namespace PersonalCards
                     Console.WriteLine();
                 }
             }
+        }
+
+        static PersonalCard GetPersonalCard(int id)
+        {
+            return new PersonalCard() {
+                Id = id
+            };
+        }
+
+        static UserProfile GetUserProfile(int id)
+        {
+            return new UserProfile() { 
+                UserId = id,
+                Email = "sth@gmail.com"
+            };
+        }
+
+        static Purchase GetPurchase(int id, int cardId, int sum)
+        {
+            return new Purchase() {
+                Id = id,
+                CardId = cardId,
+                PurchaseSum = (uint)sum
+            };
         }
     }
 }
